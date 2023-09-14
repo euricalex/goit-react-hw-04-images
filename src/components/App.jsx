@@ -44,7 +44,7 @@ export function App() {
 
     // Обновляем debouncedSearchName с задержкой
     debouncedSearch(searchName);
-  }, [searchName, debouncedSearch]);
+  }, [searchName, debouncedSearch, isSearchPerformed]);
 
   useEffect(() => {
     if (debouncedSearchName === '' || currentPage === 0) return;
@@ -78,7 +78,7 @@ export function App() {
     } else {
       setIsInitialLoad(false);
     }
-  }, [debouncedSearchName, currentPage, isInitialLoad]);
+  }, [debouncedSearchName, currentPage, isInitialLoad, isSearchPerformed]);
 
   const resetGallery = () => {
     setImages([]);
