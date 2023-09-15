@@ -15,37 +15,32 @@ export function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [debouncedSearchName, setDebouncedSearchName] = useState('');
-  const [isSearchPerformed, setIsSearchPerformed] = useState(false); // Новое состояние
-  const [isInitialLoad, setIsInitialLoad] = useState(true); // Новое состояние
 
   // Используем useCallback для создания мемоизированной функции debounce
   const debouncedSearch = useCallback(
     debounce((query) => {
       setDebouncedSearchName(query);
     }, 1000),
-    [setDebouncedSearchName] // Зависимость от setDebouncedSearchName
+    []
   );
-  
 
   useEffect(() => {
     if (searchName.trim() === '') {
-      if (isSearchPerformed) {
-        // Проверяем, что запрос пустой и поиск был выполнен
+      if (isLoading) {
         toast.info('Enter a search query.', {
           position: toast.POSITION.TOP_RIGHT,
         });
-        return;
       }
+      return;
     }
 
     setCurrentPage(1); // Обнуляем currentPage при новом поиске
     setTotalPages(0);
     setIsLoading(true);
-    setIsSearchPerformed(false); // Сбрасываем флаг, что поиск был выполнен
 
     // Обновляем debouncedSearchName с задержкой
     debouncedSearch(searchName);
-  }, [searchName, debouncedSearch, isSearchPerformed]);
+  }, [searchName, debouncedSearch, isLoading]);
 
   useEffect(() => {
     if (debouncedSearchName === '' || currentPage === 0) return;
@@ -73,20 +68,13 @@ export function App() {
       }
     };
 
-    // Если это первая загрузка страницы (isInitialLoad), не выполняем загрузку изображений
-    if (!isInitialLoad) {
-      loadImages();
-    } else {
-      setIsInitialLoad(false);
-    }
-  }, [debouncedSearchName, currentPage, isInitialLoad, isSearchPerformed]);
+    loadImages();
+  }, [debouncedSearchName, currentPage]);
 
   const resetGallery = () => {
     setImages([]);
     setTotalPages(0);
     setCurrentPage(1); // Добавляем сброс currentPage при сбросе галереи
-    setIsSearchPerformed(false); // Сбрасываем флаг поиска
-    setSearchName(''); // Добавляем сброс searchName
   };
 
   const loadMore = () => {
@@ -99,9 +87,9 @@ export function App() {
       <SearchBar onSubmit={debouncedSearch} onReset={resetGallery} />
       {images.length > 0 && <ImageGallery images={images} />}
 
-      {isLoading && !isInitialLoad && <Loader />} {/* Изменено здесь */}
+      {isLoading && <Loader />}
       {images.length > 0 && totalPages !== currentPage && !isLoading && (
-        <Button onClick={loadMore}>Load More</Button>
+        <Button onClick={loadMore} />
       )}
     </AppWrapper>
   );
