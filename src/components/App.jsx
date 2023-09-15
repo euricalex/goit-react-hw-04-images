@@ -23,8 +23,9 @@ export function App() {
     debounce((query) => {
       setDebouncedSearchName(query);
     }, 1000),
-    []
+    [setDebouncedSearchName] // Зависимость от setDebouncedSearchName
   );
+  
 
   useEffect(() => {
     if (searchName.trim() === '') {
